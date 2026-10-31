@@ -17,7 +17,7 @@ Each brand also comes with its store platform (Shopify and others) and the track
 
 This repository holds the setup guide, config snippets and registry metadata. The server itself is hosted by AdvertiserLeads, so there's nothing to install or run.
 
-> **Status: early.** The endpoint, tool names and limits below are v1 and may still change before launch. OAuth sign-in is coming; until then, connect without a key or with an API key header.
+> **Status: early.** The endpoint, tool names and limits below are v1 and may still change before launch.
 
 ## Connect
 
@@ -25,17 +25,19 @@ This repository holds the setup guide, config snippets and registry metadata. Th
 | --- | --- |
 | Endpoint | `https://advertiserleads.com/mcp` |
 | Transport | Streamable HTTP |
-| Auth | Optional. Send `Authorization: Bearer al_...` with an API key from [Settings](https://advertiserleads.com/app/settings?utm_source=github&utm_medium=readme&utm_campaign=mcp). Without a key it works anonymously, with lower limits. |
+| Auth | Optional. Sign in with your AdvertiserLeads account over OAuth 2.1 (Claude, ChatGPT, Claude Code and other OAuth-capable clients), or send `Authorization: Bearer al_...` with an API key from [Settings](https://advertiserleads.com/app/settings?utm_source=github&utm_medium=readme&utm_campaign=mcp). Without either it works anonymously, with lower limits. |
+
+Signing in and an API key give the same result: your account's plan and limits. When an anonymous client hits a limit that an account raises, the server answers `401` with a `WWW-Authenticate` challenge, so clients that support OAuth offer to sign in and then retry. You can see and disconnect signed-in apps under **Connected apps** in [Settings](https://advertiserleads.com/app/settings?utm_source=github&utm_medium=readme&utm_campaign=mcp).
 
 ### Claude Code
-
-Without a key:
 
 ```bash
 claude mcp add --transport http advertiserleads https://advertiserleads.com/mcp
 ```
 
-With your API key:
+It starts anonymously. To sign in, run `/mcp` in Claude Code, pick `advertiserleads` and choose **Authenticate**; your browser opens the AdvertiserLeads sign-in page.
+
+Or use an API key instead of signing in:
 
 ```bash
 claude mcp add --transport http advertiserleads https://advertiserleads.com/mcp --header "Authorization: Bearer al_YOUR_KEY"
@@ -44,18 +46,16 @@ claude mcp add --transport http advertiserleads https://advertiserleads.com/mcp 
 ### Claude (claude.ai and the desktop app)
 
 1. Open **Settings → Connectors** and choose **Add custom connector**.
-2. Name it `AdvertiserLeads` and paste `https://advertiserleads.com/mcp` as the URL.
+2. Name it `AdvertiserLeads` and paste `https://advertiserleads.com/mcp` as the URL. Leave the OAuth client fields empty.
 3. In a chat, turn it on from the tools menu.
 
-Custom connectors sign in with OAuth, not a pasted key, so until OAuth ships this connects anonymously. To use your plan's limits in Claude Desktop today, use the config in [examples/claude_desktop_config.json](examples/claude_desktop_config.json), which passes your key through [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) (needs Node.js).
+Claude uses the tools anonymously at first. When you hit a limit an account raises, Claude shows a **Connect** button; sign in with your AdvertiserLeads email and Claude retries the call with your plan.
 
 ### ChatGPT
 
 1. Open **Settings → Apps & Connectors → Advanced settings** and turn on **Developer mode** (Plus, Pro, Business, Enterprise or Edu).
-2. Back in **Apps & Connectors**, choose **Create**, name it `AdvertiserLeads`, paste `https://advertiserleads.com/mcp`, and pick **No authentication**.
-3. In a chat, select it from the **+** menu under Developer mode.
-
-Like Claude, ChatGPT connects anonymously until OAuth ships.
+2. Back in **Apps & Connectors**, choose **Create**, name it `AdvertiserLeads`, paste `https://advertiserleads.com/mcp`, and pick **OAuth**. ChatGPT registers itself; no client ID or secret is needed.
+3. Sign in with your AdvertiserLeads email when asked, then select it from the **+** menu under Developer mode in a chat.
 
 ### Cursor
 
@@ -98,7 +98,18 @@ Add this to `.vscode/mcp.json`. VS Code asks for the key once and stores it secu
 
 ### Anything else
 
-Any client that supports remote MCP servers over Streamable HTTP can use `https://advertiserleads.com/mcp`, with the optional `Authorization` header.
+Any client that supports remote MCP servers over Streamable HTTP can use `https://advertiserleads.com/mcp`, signed in or with the optional `Authorization` header.
+
+For OAuth clients, the server follows the [MCP authorization spec](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization):
+
+| | |
+| --- | --- |
+| Protected resource metadata | `https://advertiserleads.com/.well-known/oauth-protected-resource/mcp` |
+| Authorization server metadata | `https://advertiserleads.com/.well-known/oauth-authorization-server` |
+| Client registration | Dynamic Client Registration (RFC 7591) or a Client ID Metadata Document URL |
+| Flow | Authorization code with PKCE (S256 only), rotating refresh tokens, revocation (RFC 7009) |
+| Redirect URIs | Any https URI, an app's own URI scheme, or a loopback `http://localhost` / `http://127.0.0.1` address on any port |
+| Scope | `mcp` |
 
 ## Tools
 
@@ -109,7 +120,7 @@ Any client that supports remote MCP servers over Streamable HTTP can use `https:
 | `check_store` | A site's store platform and the tracking pixels and marketing tools it loads | `domain` |
 | `list_niches` | The niches we track, with their ids for `search_signals` | none |
 
-Without an API key or on the free plan, `search_signals` only filters by `niche`; `signal`, `min_ads`, `platform`, `pixel` and `q` need a paid plan.
+Without signing in or on the free plan, `search_signals` only filters by `niche`; `signal`, `min_ads`, `platform`, `pixel` and `q` need a paid plan.
 
 ### Coverage
 
@@ -131,7 +142,7 @@ Without an API key or on the free plan, `search_signals` only filters by `niche`
 
 The server follows the same plan rules as the website, so it never shows more than your plan does there.
 
-| | No key | Free account | Paid plans |
+| | Not signed in, no key | Free account | Paid plans |
 | --- | --- | --- | --- |
 | `search_signals` | Masked brands: signal, niche, ad counts, channels and store are visible; name, domain and Ad Library link are hidden. Only the `niche` filter applies | Masked, as on the free feed. Only the `niche` filter applies | Full rows, counted toward your plan's monthly export rows. Every filter applies |
 | `lookup_brand` | Advertising since, live ads and trend | Full result for 5 new domains a day | Full result; Pro and up also get ad history |

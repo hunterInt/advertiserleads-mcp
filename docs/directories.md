@@ -4,15 +4,15 @@ Checked against each directory's own docs on 2026-10-31. Rules change often, so 
 
 **Do these first:** the official MCP Registry, then Glama. Several other directories pull from those two or require them.
 
-**Blocked until the server has OAuth:** the Claude and ChatGPT directories. Neither accepts a pasted API key for a public listing. Both also need a privacy policy and terms page, which advertiserleads.com doesn't have yet.
+**The Claude and ChatGPT directories need OAuth,** which the server now supports: sign-in with the AdvertiserLeads account, DCR and CIMD, PKCE S256 and rotating refresh tokens (see [Connect](../README.md#connect)). Neither directory accepts a pasted API key for a public listing. The privacy policy and terms are at [advertiserleads.com/privacy](https://advertiserleads.com/privacy) and [advertiserleads.com/terms](https://advertiserleads.com/terms).
 
 ## Before submitting anywhere
 
 - [ ] `https://advertiserleads.com/mcp` is live and answers `initialize` without a key.
-- [ ] Requests with a missing or bad key get **401**, not 403. Once OAuth ships, send `WWW-Authenticate: Bearer resource_metadata=...` with it.
+- [ ] Requests with a bad or expired key or token get **401**, not 403, with `WWW-Authenticate: Bearer resource_metadata="https://advertiserleads.com/.well-known/oauth-protected-resource/mcp"`. Anonymous callers who hit a limit an account raises get the same 401, so clients offer sign-in.
 - [ ] Every tool has a `title` and explicit `readOnlyHint`, `destructiveHint` and `openWorldHint` annotations. All four tools here are read-only.
 - [ ] advertiserleads.com has a privacy policy, terms, a support contact and a square logo (48px or larger).
-- [ ] A test account with data and no MFA is ready for reviewers.
+- [ ] A test account with data and no MFA is ready for reviewers. Sign-in is by emailed magic link, which ChatGPT's review rules don't accept, so reviewers need another way in (see [ChatGPT](#8-chatgpt)).
 
 ## 1. Official MCP Registry
 
@@ -51,7 +51,7 @@ The main `punkpeye/awesome-mcp-servers` list is only for servers you install and
   🔑 - Ecommerce brands that just started, scaled or stopped Meta ads, with store platform and tracking pixels.
 ```
 
-Replace `NAMESPACE/NAME` with the Glama connector path. Use 🔐 instead of 🔑 once OAuth ships.
+Replace `NAMESPACE/NAME` with the Glama connector path. Use 🔐 instead of 🔑 once the OAuth release is live on advertiserleads.com.
 
 Source: [CONTRIBUTING.md](https://raw.githubusercontent.com/punkpeye/awesome-remote-mcp-servers/main/CONTRIBUTING.md)
 
@@ -76,11 +76,12 @@ Source: [mcp.so/submit](https://mcp.so/submit)
 - **Submissions are paused** while they rework how listings are imported. Their submit page says to publish to the official registry first.
 - [ ] Check [pulsemcp.com/submit](https://www.pulsemcp.com/submit) again once the registry listing is live.
 
-## 7. Claude connectors directory (needs OAuth)
+## 7. Claude connectors directory
 
-- [ ] Get OAuth 2.0 working with dynamic client registration or CIMD, and PKCE S256.
-  - Callback: `https://claude.ai/api/mcp/auth_callback`, plus localhost loopback for Claude Code.
+- [x] OAuth with dynamic client registration and CIMD, and PKCE S256. The server advertises `client_id_metadata_document_supported` and the `none` auth method, so Claude uses CIMD and skips registration.
+  - Callback `https://claude.ai/api/mcp/auth_callback` works, and loopback `http://localhost` / `http://127.0.0.1` on any port for Claude Code.
   - Static API-key auth is a limited beta and isn't a path to a public listing.
+- [ ] In the form's **Authentication** step, pick **Required when the server asks** and **OAuth sign-in** with DCR/CIMD (no Anthropic-held client). The tools work anonymously and the server asks for sign-in with a 401 when an anonymous caller hits a limit.
 - [ ] Test it as a custom connector in Claude first. The form asks you to confirm this.
 - [ ] Submit at **claude.ai/directory/manage → Submit new → MCP connector** (needs a paid Claude plan). The form asks for:
   - a documentation URL (this repo)
@@ -93,11 +94,16 @@ Source: [mcp.so/submit](https://mcp.so/submit)
 
 Sources: [submission](https://claude.com/docs/connectors/building/submission), [authentication](https://claude.com/docs/connectors/building/authentication)
 
-## 8. ChatGPT (needs OAuth)
+## 8. ChatGPT
 
 OpenAI's docs now call ChatGPT apps **plugins**.
 
-- [ ] Get OAuth working (DCR, CIMD or a provided client). There's no API-key flow, and public submissions reject server headers.
+- [x] OAuth with DCR and CIMD (no provided client needed). There's no API-key flow, and public submissions reject server headers.
+  - The server sends the RFC 9207 `iss` parameter and advertises `authorization_response_iss_parameter_supported`, so ChatGPT uses its stable callback `https://chatgpt.com/connector_platform_oauth_redirect`.
+  - Each tool declares `securitySchemes` of `noauth` and `oauth2` (scope `mcp`): anonymous calls work, and signing in unlocks the account's plan.
+  - In `mcp.json`, set the auth method to OAuth with `cimd` (or `dcr`) registration and scope `mcp`; discovery provides the endpoints.
+- [ ] Give reviewers a way in without a magic link. OpenAI's test account must work "without MFA approval, email or SMS codes, magic links", and AdvertiserLeads only signs in by emailed link today.
+- [ ] Check in Developer mode that hitting an anonymous limit brings up ChatGPT's sign-in. The server answers with an HTTP 401 challenge; ChatGPT also documents a tool-level `_meta["mcp/www_authenticate"]` error for this.
 - [ ] Verify the organization (individual or business), then verify the domain by serving the token at `/.well-known/openai-apps-challenge`.
 - [ ] Prepare the listing:
   - a square logo
