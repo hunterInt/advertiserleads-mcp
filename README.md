@@ -13,6 +13,8 @@ Ask Claude, ChatGPT, Cursor or any MCP client which ecommerce brands just starte
 
 Each brand also comes with its store platform (Shopify and others) and the tracking pixels and marketing tools on its site: Meta, Google Ads, GA4, GTM, TikTok, Pinterest, Snapchat, Reddit, Bing, Klaviyo, Triple Whale, Northbeam, Elevar, Attentive and Postscript.
 
+**Any store, any category.** Brand lookups and store checks work on any ecommerce domain you give them, whatever it sells. The daily signal feed covers a growing list of categories (automotive aftermarket, supplements, skincare, pet, home & kitchen, with more added every month). See [Coverage](#coverage).
+
 This repository holds the setup guide, config snippets and registry metadata. The server itself is hosted by AdvertiserLeads, so there's nothing to install or run.
 
 > **Status: early.** The endpoint, tool names and limits below are v1 and may still change before launch. OAuth sign-in is coming; until then, connect without a key or with an API key header.
@@ -109,7 +111,21 @@ Any client that supports remote MCP servers over Streamable HTTP can use `https:
 
 Without an API key or on the free plan, `search_signals` only filters by `niche`; `signal`, `min_ads`, `platform`, `pixel` and `q` need a paid plan.
 
-Niches tracked today: automotive aftermarket (`auto_aftermarket`), supplements (`supplements`) and skincare (`skincare`).
+### Coverage
+
+- **`lookup_brand` and `check_store` work for any store**, in any category. Give them a domain and they check it, even if we've never seen it before.
+- **`search_signals` covers the categories we crawl every day:**
+
+  | Niche | id |
+  | --- | --- |
+  | Automotive aftermarket | `auto_aftermarket` |
+  | Supplements | `supplements` |
+  | Skincare | `skincare` |
+  | Pet | `pet` |
+  | Home & kitchen | `home_kitchen` |
+
+  A new niche starts returning results once it tracks 50 confirmed stores, and we add new niches every month. `list_niches` always returns the current list.
+- **Don't see yours?** [Request a niche](https://advertiserleads.com/?utm_source=github&utm_medium=readme&utm_campaign=mcp#feed) and we'll email you when it's live.
 
 ### What you get on each plan
 
@@ -125,16 +141,23 @@ Lookups of brands we haven't seen before cost a live Ad Library check, so they h
 
 ## Example prompts
 
+Swap in your own category or list of domains; the brand and store tools aren't limited to the niches below.
+
+**Anyone**
+- "Here are 20 stores I'm prospecting: [domains]. Which ones run Meta ads right now, since when, and is their ad count going up or down?"
+- "Is this brand still advertising? Check brand.com and tell me what store platform and marketing tools it uses."
+
 **Agencies**
 - "Find automotive aftermarket brands that started advertising on Meta this week. Keep the Shopify stores with Klaviyo installed, and draft a three-line intro email for each offering to take over their Meta ads."
 - "Which skincare brands are scaling right now with more than 10 live ads? Group them by store platform."
+- "Find pet brands that just started running Meta ads and use the TikTok pixel too. Those already test new channels, so draft a pitch for our TikTok Shop service."
 
 **UGC creators**
 - "List supplement brands that are newly advertising and still have under 5 live ads. Those are the ones that need more creative. Write me a short DM pitching a UGC test package to each."
 - "Look up gymshark.com and tell me how long they've been advertising and whether their ad count is going up."
 
 **SaaS and app sellers**
-- "Find Shopify stores in auto aftermarket that are scaling but don't have Klaviyo. Draft an email pitching our email-marketing app."
+- "Find Shopify stores in home & kitchen that are scaling but don't have Klaviyo. Draft an email pitching our email-marketing app."
 - "Check these five domains and tell me which ones run the TikTok pixel and which use Triple Whale or Northbeam."
 
 **Lenders and revenue-based financing**
