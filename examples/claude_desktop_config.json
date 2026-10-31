@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "advertiserleads": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://advertiserleads.com/mcp",
+        "--header",
+        "Authorization:${ADVERTISERLEADS_AUTH}"
+      ],
+      "env": {
+        "ADVERTISERLEADS_AUTH": "Bearer al_YOUR_KEY"
+      }
+    }
+  }
+}

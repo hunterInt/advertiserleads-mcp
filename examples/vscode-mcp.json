@@ -1,0 +1,19 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "advertiserleads-key",
+      "description": "AdvertiserLeads API key (starts with al_)",
+      "password": true
+    }
+  ],
+  "servers": {
+    "advertiserleads": {
+      "type": "http",
+      "url": "https://advertiserleads.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:advertiserleads-key}"
+      }
+    }
+  }
+}

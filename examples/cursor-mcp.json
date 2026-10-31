@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "advertiserleads": {
+      "url": "https://advertiserleads.com/mcp",
+      "headers": {
+        "Authorization": "Bearer al_YOUR_KEY"
+      }
+    }
+  }
+}
