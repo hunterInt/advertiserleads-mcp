@@ -107,6 +107,8 @@ Any client that supports remote MCP servers over Streamable HTTP can use `https:
 | `check_store` | A site's store platform and the tracking pixels and marketing tools it loads | `domain` |
 | `list_niches` | The niches we track, with their ids for `search_signals` | none |
 
+Without an API key or on the free plan, `search_signals` only filters by `niche`; `signal`, `min_ads`, `platform`, `pixel` and `q` need a paid plan.
+
 Niches tracked today: automotive aftermarket (`auto_aftermarket`), supplements (`supplements`) and skincare (`skincare`).
 
 ### What you get on each plan
@@ -115,7 +117,7 @@ The server follows the same plan rules as the website, so it never shows more th
 
 | | No key | Free account | Paid plans |
 | --- | --- | --- | --- |
-| `search_signals` | Masked brands: signal, niche, ad counts, channels and store are visible; name, domain and Ad Library link are hidden | Masked, as on the free feed | Full rows, counted toward your plan's monthly export rows |
+| `search_signals` | Masked brands: signal, niche, ad counts, channels and store are visible; name, domain and Ad Library link are hidden. Only the `niche` filter applies | Masked, as on the free feed. Only the `niche` filter applies | Full rows, counted toward your plan's monthly export rows. Every filter applies |
 | `lookup_brand` | Advertising since, live ads and trend | Full result for 5 new domains a day | Full result; Pro and up also get ad history |
 | `check_store`, `list_niches` | Yes | Yes | Yes |
 
