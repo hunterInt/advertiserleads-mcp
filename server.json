@@ -3,7 +3,7 @@
   "name": "com.advertiserleads/mcp",
   "title": "AdvertiserLeads",
   "description": "Ecommerce brands that just started, scaled or stopped Meta ads, with store platform and pixels",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "websiteUrl": "https://advertiserleads.com/?utm_source=mcp-registry&utm_medium=listing&utm_campaign=mcp",
   "repository": {
     "url": "https://github.com/hunterInt/advertiserleads-mcp",
@@ -16,7 +16,7 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "Optional. Your AdvertiserLeads API key from Settings. Leave empty to use the server anonymously, with lower limits.",
+          "description": "Optional. Your AdvertiserLeads API key from Settings. Leave empty to sign in with OAuth instead, or to use the server anonymously with lower limits.",
           "value": "Bearer {api_key}",
           "isRequired": false,
           "isSecret": true,
