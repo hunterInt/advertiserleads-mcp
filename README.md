@@ -1,5 +1,7 @@
 # AdvertiserLeads MCP server
 
+[![AdvertiserLeads MCP server](https://mcprush.com/badge/advertiserleads-mcp/card.svg?theme=light)](https://mcprush.com/to/advertiserleads-mcp?ref=badge)
+
 Ask Claude, ChatGPT, Cursor or any MCP client which ecommerce brands just started running Meta ads, which ones are scaling, and what each brand's store runs on, then go straight to research and outreach in the same chat.
 
 [AdvertiserLeads](https://advertiserleads.com/?utm_source=github&utm_medium=readme&utm_campaign=mcp) checks ecommerce brands' US Meta ads every day and turns the changes into lead signals:
